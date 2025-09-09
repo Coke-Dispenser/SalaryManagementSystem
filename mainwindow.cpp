@@ -5,6 +5,7 @@
 #include"updateemployeewindow.h"
 #include"deleteemployeewindow.h"
 #include"findemployeewindow.h"
+#include"outputsalarywindow.h"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -49,6 +50,7 @@ void MainWindow::onCloseBtnClicked()
 {
     close();
 }
+//设置列表显示
 void MainWindow::SetListView()
 {
     QListView *EmployeeListView = ui->EmployeeListView;
@@ -112,12 +114,9 @@ QString MainWindow::getMonthLabelText() const {
 //打开增加职工窗口
 void MainWindow::on_addEmployeeButton_clicked()
 {
-    if(getMonthLabelText().trimmed().isEmpty())
+    if(getMonthLabelText().isEmpty())
     {
-        ui->SaveLabel->setText("请先创建或从文件中打开月份");
-        QTimer::singleShot(1000, this, [=]() {
-            ui->SaveLabel->setText("");
-        });
+        changenlabel("请先创建或从文件中打开月份");
         return;
     }
     addEmployeewindow* createWindow = new addEmployeewindow(this);
@@ -176,16 +175,6 @@ void MainWindow::on_loadDataByMonthButton_clicked()
     SetListView();
 }
 
-//点击保存
-void MainWindow::on_saveDataByMonthButton_clicked()
-{
-    SalaryManagement* salaryManagement = SalaryManagement::getInstance();
-    salaryManagement->saveDataByMonth(getMonthLabelText());
-    ui->SaveLabel->setText("保存成功");
-    QTimer::singleShot(1000, this, [=]() {
-        ui->SaveLabel->setText("");
-    });
-}
 //当前选中的员工
 Employee* MainWindow::getSelectedEmployee()
 {
@@ -202,24 +191,18 @@ void MainWindow::on_updateEmployeeButton_clicked()
 {
     if(getMonthLabelText().isEmpty())
     {
-        ui->SaveLabel->setText("请先创建或从文件中打开月份");
-        QTimer::singleShot(1000, this, [=]() {
-            ui->SaveLabel->setText("");
-        });
+        changenlabel("请先创建或从文件中打开月份");
         return;
     }
     SalaryManagement* salaryManagement = SalaryManagement::getInstance();
     if(salaryManagement->getEmployeeList().isEmpty())
     {
-        ui->SaveLabel->setText("请先添加职工");
-        QTimer::singleShot(1000, this, [=]() {
-            ui->SaveLabel->setText("");
-        });
+        changenlabel("请先添加职工");
         return;
     }
     if(getSelectedEmployee()==nullptr)
     {
-        changenlabel();
+        changenlabel("请先选中职工");
         return;
     }
     updateEmployeewindow* createWindow = new updateEmployeewindow(this);
@@ -227,9 +210,10 @@ void MainWindow::on_updateEmployeeButton_clicked()
     connect(createWindow,&updateEmployeewindow::UpdateEmployeeList,this,&MainWindow::setInfoView);
     createWindow->exec();
 }
-void MainWindow::changenlabel()
+//改变提示信息标签
+void MainWindow::changenlabel(const QString text)
 {
-    ui->SaveLabel->setText("请先选中职工");
+    ui->SaveLabel->setText(text);
     QTimer::singleShot(1000, this, [=]() {
         ui->SaveLabel->setText("");
     });
@@ -240,24 +224,18 @@ void MainWindow::on_deleteEmployeeButton_clicked()
 {
     if(getMonthLabelText().isEmpty())
     {
-        ui->SaveLabel->setText("请先创建或从文件中打开月份");
-        QTimer::singleShot(1000, this, [=]() {
-            ui->SaveLabel->setText("");
-        });
+        changenlabel("请先创建或从文件中打开月份");
         return;
     }
     SalaryManagement* salaryManagement = SalaryManagement::getInstance();
     if(salaryManagement->getEmployeeList().isEmpty())
     {
-        ui->SaveLabel->setText("请先添加职工");
-        QTimer::singleShot(1000, this, [=]() {
-            ui->SaveLabel->setText("");
-        });
+        changenlabel("请先添加职工");
         return;
     }
     if(getSelectedEmployee()==nullptr)
     {
-        changenlabel();
+        changenlabel("请先选中职工");
         return;
     }
     deleteEmployeewindow* createWindow = new deleteEmployeewindow(this);
@@ -266,30 +244,25 @@ void MainWindow::on_deleteEmployeeButton_clicked()
     createWindow->exec();
 }
 
-
+//打开查找窗口
 void MainWindow::on_getEmployeeButton_clicked()
 {
     if(getMonthLabelText().isEmpty())
     {
-        ui->SaveLabel->setText("请先创建或从文件中打开月份");
-        QTimer::singleShot(1000, this, [=]() {
-            ui->SaveLabel->setText("");
-        });
+        changenlabel("请先创建或从文件中打开月份");
         return;
     }
     SalaryManagement* salaryManagement = SalaryManagement::getInstance();
     if(salaryManagement->getEmployeeList().isEmpty())
     {
-        ui->SaveLabel->setText("请先添加职工");
-        QTimer::singleShot(1000, this, [=]() {
-            ui->SaveLabel->setText("");
-        });
+        changenlabel("请先添加职工");
         return;
     }
     findEmployeewindow* createWindow = new findEmployeewindow(this);
     connect(createWindow,&findEmployeewindow::UpdateEmployeeList,this,&MainWindow::setInfoView);
     createWindow->exec();
 }
+//设置显示信息
 void MainWindow::setInfoView()
 {
     if(SelectedEmployee!=nullptr)
@@ -337,3 +310,21 @@ void MainWindow::setInfoView()
         ui->avatarlabel->setPixmap(QPixmap());
     }
 }
+//打开输出窗口
+void MainWindow::on_outputSalaryButton_clicked()
+{
+    if(getMonthLabelText().isEmpty())
+    {
+        changenlabel("请先创建或从文件中打开月份");
+        return;
+    }
+    SalaryManagement* salaryManagement = SalaryManagement::getInstance();
+    if(salaryManagement->getEmployeeList().isEmpty())
+    {
+        changenlabel("请先添加职工");
+        return;
+    }
+    outputSalarywindow* createWindow = new outputSalarywindow(this);
+    createWindow->exec();
+}
+

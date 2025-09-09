@@ -35,6 +35,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         deleteemployeewindow.h deleteemployeewindow.cpp deleteemployeewindow.ui
         findemployeewindow.h findemployeewindow.cpp findemployeewindow.ui
         default.qrc
+        outputsalarywindow.h outputsalarywindow.cpp outputsalarywindow.ui
 
 
 

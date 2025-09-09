@@ -77,7 +77,7 @@ public:
     double getTransportationAllowance() const { return TransportationAllowance; }
     void setTransportationAllowance(double transportationAllowance) { TransportationAllowance =transportationAllowance; }
 
-    double getGrossPay()
+    double getGrossPay()const
     {
         return  BaseSalary+Allowances+PositionAllowance+
                 Subsidies+HousingAllowance+TransportationAllowance;
@@ -91,15 +91,13 @@ public:
 
     double getMembershipFees() const { return MembershipFees; }
     void setMembershipFees(double membershipFees) { MembershipFees = membershipFees; }
-
-    double getPersonalIncomeTax() ;
-
-    double getDeductions()
+    double getPersonalIncomeTax()const ;
+    double getDeductions()const
     {
         return Rent+Savings+MembershipFees+getPersonalIncomeTax();;
     }
 
-    double getNetPay()
+    double getNetPay()const
     {
 
         return getGrossPay()-getDeductions();

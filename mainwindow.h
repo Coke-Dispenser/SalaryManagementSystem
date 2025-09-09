@@ -26,7 +26,7 @@ public:
     QString getMonthLabelText() const;
     Employee* getSelectedEmployee();
     void setSelectedEmployee(Employee*emp);
-    void changenlabel();
+    void changenlabel(const QString text);
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
@@ -43,10 +43,10 @@ private slots:
     void on_addEmployeeButton_clicked();
     void on_EmployeeListView_clicked(const QModelIndex &index);
     void on_loadDataByMonthButton_clicked();
-    void on_saveDataByMonthButton_clicked();
     void on_updateEmployeeButton_clicked();
     void on_deleteEmployeeButton_clicked();
     void on_getEmployeeButton_clicked();
+    void on_outputSalaryButton_clicked();
 
 private:
     Employee*SelectedEmployee=nullptr;

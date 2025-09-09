@@ -783,7 +783,7 @@ font-size:12px;
                </spacer>
               </item>
               <item>
-               <widget class="QPushButton" name="saveDataByMonthButton">
+               <widget class="QPushButton" name="outputSalaryButton">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -818,7 +818,7 @@ font-size:12px;
 }</string>
                 </property>
                 <property name="text">
-                 <string>保存</string>
+                 <string>输出工资</string>
                 </property>
                </widget>
               </item>
