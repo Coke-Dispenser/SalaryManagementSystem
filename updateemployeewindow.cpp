@@ -17,7 +17,7 @@ updateEmployeewindow::updateEmployeewindow(MainWindow *mainWin,QWidget *parent)
             ));
     }
     setplaceholderText();
-    setWindowFlags(Qt::FramelessWindowHint);
+    setWindowFlags(Qt::Window|Qt::FramelessWindowHint);
     setAttribute(Qt::WA_TranslucentBackground);
     connect(ui->closeButton, &QPushButton::clicked, this, &updateEmployeewindow::onCloseBtnClicked);
 }
@@ -81,7 +81,7 @@ void updateEmployeewindow::on_confirmButton_clicked()
 {
     if(mainWindowptr->getSelectedEmployee()==nullptr)
     {
-        mainWindowptr->changenlabel();
+        mainWindowptr->changenlabel("请先选中职工");
         close();
     }
     Employee*emp=mainWindowptr->getSelectedEmployee();
@@ -115,9 +115,9 @@ QString updateEmployeewindow::getEffectiveText(QLineEdit *lineEdit)
     }
 }
 void updateEmployeewindow::setplaceholderText()
-{    if(mainWindowptr->getSelectedEmployee()==nullptr)
+{if(mainWindowptr->getSelectedEmployee()==nullptr)
     {
-        mainWindowptr->changenlabel();
+        mainWindowptr->changenlabel("请先选中职工");
         close();
     }
     Employee*emp=mainWindowptr->getSelectedEmployee();

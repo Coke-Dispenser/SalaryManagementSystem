@@ -6,7 +6,7 @@ outputSalarywindow::outputSalarywindow(MainWindow *mainWin,QWidget *parent)
     , ui(new Ui::outputSalarywindow)
 {
     ui->setupUi(this);
-    setWindowFlags(Qt::FramelessWindowHint);
+    setWindowFlags(Qt::Window|Qt::FramelessWindowHint);
     setAttribute(Qt::WA_TranslucentBackground);
     connect(ui->closeButton, &QPushButton::clicked, this, &outputSalarywindow::onCloseBtnClicked);
 }

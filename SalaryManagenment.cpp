@@ -125,30 +125,28 @@ void SalaryManagement::clearEmployeeList()
 {
     EmployeeList.clear();
 }
+
+
+
+// 输出单个员工薪资到Excel
 void SalaryManagement::outputEmployeeSalary(Employee* emp)
 {
-    auto getDisplayWidth = [](const QString& str) {
-        int width = 0;
-        foreach (const QChar& c, str) {
-            if (c.unicode() >= 0x4e00 && c.unicode() <= 0x9fa5) {
-                width += 2;
-            } else {
-                width += 1;
-            }
-        }
-        return width;
-    };
-    QString fileName = QString("%1 %2.txt")
+    // 创建Excel应用
+    QAxObject* excel = new QAxObject("Excel.Application");
+    excel->setProperty("Visible", false); // 不显示Excel窗口
+
+    // 创建工作簿
+    QAxObject* workbooks = excel->querySubObject("Workbooks");
+    QAxObject* workbook = workbooks->querySubObject("Add");
+    QAxObject* worksheet = workbook->querySubObject("Worksheets(int)", 1); // 获取第一个工作表
+
+    // 设置文件名
+    QString fileName = QString("%1 %2.xlsx")
                            .arg(emp->getEmployeeID())
                            .arg(emp->getName());
-    QFile File(QDir::currentPath() + '/' + fileName);
+    QString filePath = QDir::currentPath() + '/' + fileName;
 
-    if(!File.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text))
-    {
-        qDebug() << "打开文件失败";
-        return;
-    }
-    QTextStream out(&File);
+    // 准备数据
     QStringList row;
     row << emp->getEmployeeID()
         << emp->getName()
@@ -165,59 +163,64 @@ void SalaryManagement::outputEmployeeSalary(Employee* emp)
         << QString::number(emp->getPersonalIncomeTax())
         << QString::number(emp->getDeductions())
         << QString::number(emp->getNetPay());
-    QList<int> columnWidths;
-    for (int i = 0; i < headers.size() && i < row.size(); ++i) {
-        int headerWidth = getDisplayWidth(headers[i]);
-        int dataWidth = getDisplayWidth(row[i]);
-        columnWidths << qMax(headerWidth, dataWidth) + 2; // 加2作为边距
-    }
-    for (int width : columnWidths) {
-        out << QString(width, '-');
-    }
-    out << "\n";
-    for (int i = 0; i < headers.size() && i < columnWidths.size(); ++i) {
-        QString header = headers[i];
-        int spacesNeeded = columnWidths[i] - getDisplayWidth(header);
-        out << header << QString(spacesNeeded, ' ');
-    }
-    out << "\n";
-    for (int width : columnWidths) {
-        out << QString(width, '-');
-    }
-    out << "\n";
-    for (int i = 0; i < row.size() && i < columnWidths.size(); ++i) {
-        QString cellData = row[i];
-        int dataWidth = getDisplayWidth(cellData);
-        int spacesNeeded = columnWidths[i] - dataWidth;
-        if (i >= 2) {
-            out << QString(spacesNeeded, ' ') << cellData;
-        } else {
-            out << cellData << QString(spacesNeeded, ' ');
-        }
-    }
-    out << "\n";
-    for (int width : columnWidths) {
-        out << QString(width, '-');
-    }
-    out << "\n";
 
-    File.close();
+    // 写入表头
+    for (int i = 0; i < headers.size(); ++i) {
+        QAxObject* cell = worksheet->querySubObject("Cells(int, int)", 1, i + 1);
+        cell->setProperty("Value", headers[i]);
+        delete cell;
+    }
+
+    // 写入数据
+    for (int i = 0; i < row.size(); ++i) {
+        QAxObject* cell = worksheet->querySubObject("Cells(int, int)", 2, i + 1);
+        cell->setProperty("Value", row[i]);
+        delete cell;
+    }
+
+    // 保存并关闭
+    workbook->dynamicCall("SaveAs(const QString&)", QDir::toNativeSeparators(filePath));
+    workbook->dynamicCall("Close()");
+    excel->dynamicCall("Quit()");
+
+    // 清理资源
+    delete worksheet;
+    delete workbook;
+    delete workbooks;
+    delete excel;
 }
+
+// 输出月度薪资到Excel
 void SalaryManagement::outputMonthSalary(const QString &month)
 {
-    double SumSalary = 0.0;
-    for(int i = 0; i < EmployeeList.size(); i++)
-    {
-        SumSalary += EmployeeList[i].getNetPay();
+    // 创建Excel应用
+    QAxObject* excel = new QAxObject("Excel.Application");
+    excel->setProperty("Visible", false); // 不显示Excel窗口
+
+    // 创建工作簿
+    QAxObject* workbooks = excel->querySubObject("Workbooks");
+    QAxObject* workbook = workbooks->querySubObject("Add");
+    QAxObject* worksheet = workbook->querySubObject("Worksheets(int)", 1); // 获取第一个工作表
+
+    // 设置文件名
+    QString fileName = month.trimmed() + "月工资明细.xlsx";
+    QString filePath = QDir::currentPath() + '/' + fileName;
+
+    // 计算总工资
+    double totalSalary = 0.0;
+    for(const auto& emp : EmployeeList) {
+        totalSalary += emp.getNetPay();
     }
-    QFile File(QDir::currentPath() + '/' + month.trimmed() + "月工资明细.txt");
-    if(!File.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text))
-    {
-        qDebug() << "打开文件失败";
-        return;
+
+    // 写入表头
+    for (int i = 0; i < headers.size(); ++i) {
+        QAxObject* cell = worksheet->querySubObject("Cells(int, int)", 1, i + 1);
+        cell->setProperty("Value", headers[i]);
+        delete cell;
     }
-    QTextStream out(&File);
-    QList<QStringList> data;
+
+    // 写入员工数据
+    int rowIndex = 2; // 从第2行开始（第1行是表头）
     for (const auto& emp : EmployeeList) {
         QStringList row;
         row << emp.getEmployeeID()
@@ -235,85 +238,31 @@ void SalaryManagement::outputMonthSalary(const QString &month)
             << QString::number(emp.getPersonalIncomeTax())
             << QString::number(emp.getDeductions())
             << QString::number(emp.getNetPay());
-        data << row;
-    }
-    QList<int> columnWidths;
-    for (int i = 0; i < headers.size(); ++i) {
-        auto calculateWidth = [](const QString& str) {
-            int width = 0;
-            foreach (const QChar& c, str) {
-                if (c.unicode() >= 0x4e00 && c.unicode() <= 0x9fa5) {
-                    width += 2;
-                } else {
-                    width += 1;
-                }
-            }
-            return width;
-        };
 
-        int maxWidth = calculateWidth(headers[i]);
-        for (const auto& row : data) {
-            if (i < row.size()) {
-                int dataWidth = calculateWidth(row[i]);
-                if (dataWidth > maxWidth) {
-                    maxWidth = dataWidth;
-                }
-            }
+        // 写入一行数据
+        for (int colIndex = 0; colIndex < row.size(); ++colIndex) {
+            QAxObject* cell = worksheet->querySubObject("Cells(int, int)", rowIndex, colIndex + 1);
+            cell->setProperty("Value", row[colIndex]);
+            delete cell;
         }
-        columnWidths << maxWidth + 2;
-    }
-    for (int width : columnWidths) {
-        out << QString(width, '-');
-    }
-    out << "\n";
 
-    for (int i = 0; i < headers.size(); ++i) {
-        QString header = headers[i];
-        int headerWidth = 0;
-        foreach (const QChar& c, header) {
-            headerWidth += (c.unicode() >= 0x4e00 && c.unicode() <= 0x9fa5) ? 2 : 1;
-        }
-        int spacesNeeded = columnWidths[i] - headerWidth;
-        out << header << QString(spacesNeeded, ' ');
+        rowIndex++;
     }
-    out << "\n";
-    for (int width : columnWidths) {
-        out << QString(width, '-');
-    }
-    out << "\n";
-    for (const auto& row : data) {
-        for (int i = 0; i < row.size(); ++i) {
-            QString cellData = row[i];
-            int dataWidth = 0;
-            foreach (const QChar& c, cellData) {
-                dataWidth += (c.unicode() >= 0x4e00 && c.unicode() <= 0x9fa5) ? 2 : 1;
-            }
-            int spacesNeeded = columnWidths[i] - dataWidth;
 
-            if (i >= 2) {
-                out << QString(spacesNeeded, ' ') << cellData;
-            } else {
-                out << cellData << QString(spacesNeeded, ' ');
-            }
-        }
-        out << "\n";
-    }
-    for (int width : columnWidths) {
-        out << QString(width, '-');
-    }
-    out << "\n";
-    int totalWidth = 0;
-    for (int width : columnWidths) {
-        totalWidth += width;
-    }
-    QString totalStr = month + "月总工资 " + QString::number(SumSalary) + " 元";
-    int totalStrWidth = 0;
-    foreach (const QChar& c, totalStr) {
-        totalStrWidth += (c.unicode() >= 0x4e00 && c.unicode() <= 0x9fa5) ? 2 : 1;
-    }
-    int totalSpaces = totalWidth - totalStrWidth;
-    out << QString(totalSpaces, ' ') << totalStr << "\n";
+    // 写入总计
+    QString totalStr = QString("%1月总工资 %2 元").arg(month).arg(totalSalary);
+    QAxObject* totalCell = worksheet->querySubObject("Cells(int, int)", rowIndex + 1, 1);
+    totalCell->setProperty("Value", totalStr);
+    delete totalCell;
 
-    File.close();
+    // 保存并关闭
+    workbook->dynamicCall("SaveAs(const QString&)", QDir::toNativeSeparators(filePath));
+    workbook->dynamicCall("Close()");
+    excel->dynamicCall("Quit()");
+
+    // 清理资源
+    delete worksheet;
+    delete workbook;
+    delete workbooks;
+    delete excel;
 }
-

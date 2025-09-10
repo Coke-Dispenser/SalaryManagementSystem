@@ -7,7 +7,7 @@ createMonthwindow::createMonthwindow(QWidget *parent)
     , ui(new Ui::createMonthwindow)
 {
     ui->setupUi(this);
-    setWindowFlags(Qt::FramelessWindowHint);
+    setWindowFlags(Qt::Window|Qt::FramelessWindowHint);
     setAttribute(Qt::WA_TranslucentBackground);
     connect(ui->closeButton, &QPushButton::clicked, this, &createMonthwindow::onCloseBtnClicked);
 }

@@ -3,8 +3,17 @@
 
 #endif // SALARYMANAGENMENT_H
 #include<QObject>
-#include <QString>
+#include<QString>
+#include<Qfile>
+#include<QDir>
+#include<QDebug>
+#include<QStringList>
+#include<QTextStream>
 #include <QList>
+#include <QAxObject>
+#include <QDateTime>
+#include <QDebug>
+#include <QColor>
 #include"Employee.h"
 
 
@@ -15,6 +24,11 @@ private:
     static SalaryManagement*InstanceSM;
     QList<Employee> EmployeeList;
     const QString defaultAvatarPath=":/image/image/default.png";
+    QStringList headers{
+        "职工编号", "姓名","基本工资", "津贴", "岗贴", "补贴",
+        "房贴", "交通补贴", "应发数", "房租", "储蓄",
+        "会费", "个人所得税", "应扣数", "实发数"
+    };
 public:
     static SalaryManagement*getInstance();
     SalaryManagement(){}
@@ -25,4 +39,6 @@ public:
     bool loadDataByMonth(const QString &month);//加载数据
     bool saveDataByMonth(const QString &month);//保存数据
     void clearEmployeeList();//清除列表
+    void outputMonthSalary(const QString &month);//输出当月总薪资
+    void outputEmployeeSalary(Employee*emp);//输出当前职工薪资
 };

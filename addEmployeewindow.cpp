@@ -13,7 +13,7 @@ addEmployeewindow::addEmployeewindow(MainWindow *mainWin, QWidget *parent)
     Qt::KeepAspectRatio,
     Qt::SmoothTransformation));
 
-    setWindowFlags(Qt::FramelessWindowHint);
+    setWindowFlags(Qt::Window|Qt::FramelessWindowHint);
     setAttribute(Qt::WA_TranslucentBackground);
     connect(ui->closeButton, &QPushButton::clicked, this, &addEmployeewindow::onCloseBtnClicked);
 }

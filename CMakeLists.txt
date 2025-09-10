@@ -9,8 +9,8 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets AxContainer)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets AxContainer)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -61,7 +61,10 @@ else()
     endif()
 endif()
 
-target_link_libraries(SalaryManagementSystem PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(SalaryManagementSystem PRIVATE
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::AxContainer  # 链接ActiveQt模块
+)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
@@ -88,12 +91,9 @@ if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(SalaryManagementSystem)
 endif()
 if(WIN32)
-    # 设置Windows图标
     set(ICON_FILE "${CMAKE_CURRENT_SOURCE_DIR}/sms.ico")
-    # 创建一个临时的rc文件
     file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/temp_icon.rc"
         "IDI_ICON1 ICON DISCARDABLE \"${ICON_FILE}\"")
-    # 将临时rc文件添加到目标
     target_sources(SalaryManagementSystem PRIVATE
         "${CMAKE_CURRENT_BINARY_DIR}/temp_icon.rc")
 endif()

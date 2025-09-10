@@ -6,7 +6,7 @@ findEmployeewindow::findEmployeewindow(MainWindow *mainWin,QWidget *parent)
     , ui(new Ui::findEmployeewindow)
 {
     ui->setupUi(this);
-    setWindowFlags(Qt::FramelessWindowHint);
+    setWindowFlags(Qt::Window|Qt::FramelessWindowHint);
     setAttribute(Qt::WA_TranslucentBackground);
     connect(ui->closeButton, &QPushButton::clicked, this, &findEmployeewindow::onCloseBtnClicked);
     connect(ui->confirmButton,&QPushButton::clicked,this,&findEmployeewindow::on_confirmButton_clicked);

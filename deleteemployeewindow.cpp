@@ -6,7 +6,7 @@ deleteEmployeewindow::deleteEmployeewindow(MainWindow *mainWin,QWidget *parent)
     , ui(new Ui::deleteEmployeewindow)
 {
     ui->setupUi(this);
-    setWindowFlags(Qt::FramelessWindowHint);
+    setWindowFlags(Qt::Window|Qt::FramelessWindowHint);
     setAttribute(Qt::WA_TranslucentBackground);
     connect(ui->closeButton, &QPushButton::clicked, this, &deleteEmployeewindow::onCloseBtnClicked);
     ui->selectedLabel->setAlignment(Qt::AlignCenter);
